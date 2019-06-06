@@ -1,0 +1,15 @@
+node_modules/
+dist/**
+jest/**
+migrations/**
+nginx/**
+public/**
+scripts/**
+webpack/**
+.idea/
+coverage/
+
+dist/
+build/
+
+dev_dist/node_modules/
