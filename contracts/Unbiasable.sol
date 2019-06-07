@@ -21,7 +21,14 @@ contract Unbiasable {
         uint256 C; // block number where the challenge is confirmed
         uint256 T; // challenge time
         uint256 t; // iteration of the challenge
+        Commit[] commits; // list of submitted proof commits
         bytes32 validProofHash; // the first valid proof hash
+    }
+
+    struct Commit {
+        address evaluator;
+        uint256 number;
+        bytes32 proofCommit;
     }
 
     enum State {
@@ -85,6 +92,22 @@ contract Unbiasable {
             return State.EVAL;
         }
         return State.VERIFY;
+    }
+
+    function commit(
+        bytes32 seed,
+        bytes32 proofCommit
+    )
+        public
+    {
+        Challenge storage c = challenges[seed];
+        require(c.maker != address(0x0), "No such challenge.");
+        Commit memory commit = Commit({
+            evaluator: msg.sender,
+            number: block.number,
+            proofCommit: proofCommit
+        });
+        c.commits.push(commit);
     }
 
     function verify(
