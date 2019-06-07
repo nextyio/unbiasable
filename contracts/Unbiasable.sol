@@ -139,4 +139,15 @@ contract Unbiasable {
         c.validProofHash = proofHash;
         return true;
     }
+
+    function finalize(
+        bytes32 seed
+    )
+        public
+    {
+        Challenge storage c = challenges[seed];
+        require(c.maker != address(0x0), "No such challenge.");
+        require(block.number > c.C + c.T, "Challenge not finished.");
+        // TODO
+    }
 }
