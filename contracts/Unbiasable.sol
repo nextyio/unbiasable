@@ -24,6 +24,14 @@ contract Unbiasable {
         bytes32 validProofHash; // the first valid proof hash
     }
 
+    enum State {
+        NONE,
+        EVAL,
+        VERIFY,
+        FINISHED,
+        FAILED
+    }
+
     // seed(address + entropy) => Challenge
     mapping(bytes32 => Challenge) challenges;
     bytes32[] evaluating;
@@ -57,6 +65,27 @@ contract Unbiasable {
         });
         evaluating.push(seed);
         //Challenge storage challenge = challenges[seed];
+    }
+
+    function state(
+        Challenge c
+    )
+        internal
+        returns (State)
+    {
+        if (c.maker == addres(0x0)) {
+            return State.NONE;
+        }
+        if (block.number > c.C + c.T) {
+            return State.FINISHED;
+        }
+        if (c.entropy == bytes32(0x0)) {
+            return State.FAILED;
+        }
+        if (c.validProofHash == bytes(0x0)) {
+            return State.EVAL;
+        }
+        return State.VERIFY;
     }
 
     function verify(
