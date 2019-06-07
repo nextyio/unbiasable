@@ -64,7 +64,6 @@ contract Unbiasable {
             validProofHash: 0x0
         });
         evaluating.push(seed);
-        //Challenge storage challenge = challenges[seed];
     }
 
     function state(
@@ -98,7 +97,7 @@ contract Unbiasable {
         bytes32 seed = input[0];
         Challenge storage c = challenges[seed];
         require(c.t == uint256(input[1]), "No such challenge.");
-        // just hash the whole input for simplicity, although the seed and t are not needed here
+        // just hash the whole input for simplicity, technically only proof is needed here
         bytes32 proofHash = sha256(abi.encodePacked(input));
         require(c.validProofHash != proofHash, "Proof already verified.")
         assembly {
