@@ -37,6 +37,7 @@ contract Unbiasable {
         bytes32 entropy; // also treated as unique identification for each maker address
         uint256 C; // block number where the challenge is confirmed
         uint256 T; // challenge time
+        uint256 Te; // evaluation time
         uint256 t; // iteration of the challenge
         Commit[] commits; // list of submitted proof commits
         bytes32 validProofHash; // the first valid proof hash
@@ -70,14 +71,15 @@ contract Unbiasable {
         require(_entropy != 0x0, "Must provide entropy.");
         bytes32 seed = sha256(abi.encodePacked(msg.sender, _entropy));
         require(challenges[seed].maker == address(0x0), "Duplicated challenge.");
-        uint256 Tv = Math.max(_T / 8, MinV);
+        uint256 Tv = Math.max(_T * vDividend / vDivisor, MinV);
         uint256 Te = _T - Tv;
 
         challenges[seed] = Challenge ({
             maker: msg.sender,
             entropy: _entropy,
-            T: _T,
             C: block.number,
+            T: _T,
+            Te: Te,
             t: Te * minSpeed,
             validProofHash: 0x0
         });
@@ -113,6 +115,8 @@ contract Unbiasable {
     {
         Challenge storage c = challenges[seed];
         require(c.maker != address(0x0), "No such challenge.");
+        require(block.number <= c.C + c.Te, "Evaluation time is over.");
+        require(c.validProofHash != 0x0, "Proof is already verified.");
         Commit memory commit = Commit({
             evaluator: msg.sender,
             number: block.number,
