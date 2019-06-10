@@ -162,10 +162,26 @@ contract Unbiasable {
         bytes32 seed
     )
         public
+        returns (uint256[] numbers, address[] evaluators)
     {
         Challenge storage c = challenges[seed];
         require(c.maker != address(0x0), "No such challenge.");
         require(block.number > c.C + c.T, "Challenge not finished.");
-        // TODO
+        require(c.validProofHash != 0x0, "No proof is verified.");
+        require(c.entropy != 0x0, "Challenge is aborted.");
+        // Loop through the whole commits
+        for (uint i=0; i<c.commits.length; ++i) {
+            Commit commit = c.commits[i];
+            bytes32 proofCommit = sha256(abi.encodePacked(commit.evaluator,c.validProofHash));
+            if (proofCommit != commit.proofCommit) {
+                // invalid commit
+                c.commits[i]=c.commits[c.commits.length-1];
+                c.commits.length--;
+                continue;
+            }
+            numbers.push(commit.number);
+            evaluators.push(commit.evaluator);
+        }
+        return (numbers, evaluators);
     }
 }
