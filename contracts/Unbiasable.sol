@@ -1,5 +1,7 @@
 pragma solidity ^0.5.0;
 
+import "openzeppelin-solidity/contracts/math/Math.sol";
+
 contract Unbiasable {
 
     // consensus variables
@@ -75,29 +77,27 @@ contract Unbiasable {
         uint256 Tv = Math.max(_T * vDividend / vDivisor, MinV);
         uint256 Te = _T - Tv;
 
-        challenges[seed] = Challenge ({
-            maker: msg.sender,
-            entropy: _entropy,
-            C: block.number,
-            T: _T,
-            Te: Te,
-            t: Te * minSpeed,
-            validProofHash: 0x0
-        });
-        evaluating.push(seed);
+        // Workaround for challenges[seed] = Challenge({})
+        challenges[seed].maker = msg.sender;
+        challenges[seed].entropy = _entropy;
+        challenges[seed].C = block.number;
+        challenges[seed].T = _T;
+        challenges[seed].Te = Te;
+        challenges[seed].t = Te * minSpeed;
     }
 
     function state(
-        Challenge c
+        Challenge storage c
     )
         internal
+        view
         returns (State)
     {
         if (c.maker == address(0x0)) {
             return State.NONE;
         }
         if (c.entropy == 0x0) {
-            return State.FAILED;
+            return State.FAIL;
         }
         if (block.number < c.C + c.Te) {
             return State.EVAL;
@@ -122,12 +122,12 @@ contract Unbiasable {
         require(block.number <= c.C + c.Te, "Evaluation time is over.");
         require(c.validProofHash != 0x0, "Proof is already verified.");
         //require(state(c) == State.EVAL, "Not in evaluation phase.");
-        Commit memory commit = Commit({
+        Commit memory cm = Commit({
             evaluator: msg.sender,
             number: block.number,
             proofCommit: proofCommit
         });
-        c.commits.push(commit);
+        c.commits.push(cm);
     }
 
     function verify(
@@ -142,7 +142,7 @@ contract Unbiasable {
         require(c.t == uint256(input[1]), "No such challenge.");
         // just hash the whole input for simplicity, technically only proof is needed here
         bytes32 proofHash = sha256(abi.encodePacked(input));
-        require(c.validProofHash != proofHash, "Proof already verified.")
+        require(c.validProofHash != proofHash, "Proof already verified.");
         assembly {
             // call vdfVerify precompile
             if iszero(call(not(0), 0xFF, 0, input, 576, valid, 1)) {
@@ -167,22 +167,28 @@ contract Unbiasable {
         bytes32 seed
     )
         public
-        returns (uint256[] numbers, address[] evaluators)
+        returns (uint256[] memory numbers, address[] memory evaluators)
     {
         Challenge storage c = challenges[seed];
         require(state(c) == State.SUCCESS, "Challenge not success.");
-        // Loop through the whole commits
-        for (uint i=0; i<c.commits.length; ++i) {
-            Commit commit = c.commits[i];
-            bytes32 proofCommit = sha256(abi.encodePacked(commit.evaluator,c.validProofHash));
-            if (proofCommit != commit.proofCommit) {
+        // Remove invalid commits
+        for (uint i = 0; i<c.commits.length; ++i) {
+            Commit storage cm = c.commits[i];
+            bytes32 proofCommit = sha256(abi.encodePacked(cm.evaluator,c.validProofHash));
+            if (proofCommit != cm.proofCommit) {
                 // invalid commit
-                c.commits[i]=c.commits[c.commits.length-1];
+                c.commits[i] = c.commits[c.commits.length-1];
                 c.commits.length--;
                 continue;
             }
-            numbers.push(commit.number);
-            evaluators.push(commit.evaluator);
+        }
+        // Copy number and address to return
+        numbers = new uint256[](c.commits.length);
+        evaluators = new address[](c.commits.length);
+        for (uint i = 0; i<c.commits.length; ++i) {
+            Commit storage cm = c.commits[i];
+            numbers[i] = cm.number;
+            evaluators[i] = cm.evaluator;
         }
         return (numbers, evaluators);
     }
