@@ -50,17 +50,18 @@ contract Unbiasable {
     }
 
     enum State {
-        NONE,
-        EVAL,
-        VERIFY,
-        FINISHED,
-        FAILED
+        NONE,    // not a challenge
+        EVAL,    // evaluation time
+        VERIFY,  // out of evaluation time (Te)
+        SUCCESS, // out of time (T) with one proof verified
+        TIMEOUT, // out of time without any proof verified
+        FAIL     // more than one valid proofs
     }
 
     // seed(address + entropy) => Challenge
     mapping(bytes32 => Challenge) challenges;
 
-    // TODO: keep a list of challanges
+    // TODO: keep a list of challenges
 
     function challenge(
         bytes32 _entropy,
@@ -92,19 +93,22 @@ contract Unbiasable {
         internal
         returns (State)
     {
-        if (c.maker == addres(0x0)) {
+        if (c.maker == address(0x0)) {
             return State.NONE;
         }
-        if (block.number > c.C + c.T) {
-            return State.FINISHED;
-        }
-        if (c.entropy == bytes32(0x0)) {
+        if (c.entropy == 0x0) {
             return State.FAILED;
         }
-        if (c.validProofHash == bytes(0x0)) {
+        if (block.number < c.C + c.Te) {
             return State.EVAL;
         }
-        return State.VERIFY;
+        if (block.number < c.C + c.T) {
+            return State.VERIFY;
+        }
+        if (c.validProofHash == 0x0) {
+            return State.TIMEOUT;
+        }
+        return State.SUCCESS;
     }
 
     function commit(
@@ -117,6 +121,7 @@ contract Unbiasable {
         require(c.maker != address(0x0), "No such challenge.");
         require(block.number <= c.C + c.Te, "Evaluation time is over.");
         require(c.validProofHash != 0x0, "Proof is already verified.");
+        //require(state(c) == State.EVAL, "Not in evaluation phase.");
         Commit memory commit = Commit({
             evaluator: msg.sender,
             number: block.number,
@@ -165,10 +170,7 @@ contract Unbiasable {
         returns (uint256[] numbers, address[] evaluators)
     {
         Challenge storage c = challenges[seed];
-        require(c.maker != address(0x0), "No such challenge.");
-        require(block.number > c.C + c.T, "Challenge not finished.");
-        require(c.validProofHash != 0x0, "No proof is verified.");
-        require(c.entropy != 0x0, "Challenge is aborted.");
+        require(state(c) == State.SUCCESS, "Challenge not success.");
         // Loop through the whole commits
         for (uint i=0; i<c.commits.length; ++i) {
             Commit commit = c.commits[i];
