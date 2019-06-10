@@ -2,9 +2,29 @@ pragma solidity ^0.5.0;
 
 contract Unbiasable {
 
+    // consensus variables
+    uint256 maxSpeed;
+    uint256 minSpeed;
+
+    // The oldest the seed can be, any older data will be subjected to co-ordinated preimage attack.
+    // This is just the lower bound recommendation of the protocol, user should choose a much higher value fo r better security against preimage attack.
+    uint256 MinT0 = 4; // 2 blocks is 'just' enough to prevent a single sealer pre-image attack.
+
+    // Minimum of verification time (in blocks). Give other verificator enough time to submit conflicted proof to nullify the challege.
+    uint256 MinV = 60; // 2 minutes of block
+
+    // Another minimum of verification time over the total T.
+    uint256 vDividend = 1;
+    uint256 vDivisor = 8;
+
+    // r is the reduction rate of the rewards for each valid hash commited.
+    // r = 1/2 is the neutral value where early evaluator re-commit doesn't give them any benefit, but also doesn't lose any rewards. This still allows Early Evaluator Griefing Attacks on later evaluators, smaller r value should be chosen for production.
+    // uint256 rDividend = 1;
+    // uint256 rDivisor = 2;
+
     constructor (
-        uint256 _maxSpeed, // initial value
-        uint256 _minSpeed  // initial value
+        uint256 _maxSpeed, // speed of the fatest evaluator (t/block)
+        uint256 _minSpeed // speed of the fatest evaluator (t/block)
     )
         public
     {
@@ -25,7 +45,7 @@ contract Unbiasable {
     struct Commit {
         address evaluator;
         uint256 number;
-        bytes32 proofCommit;
+        bytes32 proofCommit; // SHA256(evaluator+proof)
     }
 
     enum State {
@@ -38,14 +58,8 @@ contract Unbiasable {
 
     // seed(address + entropy) => Challenge
     mapping(bytes32 => Challenge) challenges;
-    bytes32[] evaluating;
-    bytes32[] validating;
-    bytes32[] finished;
 
-    // global variables
-    uint256 maxSpeed;
-    uint256 minSpeed;
-    uint256 MinV = 60; // 2 minutes of block
+    // TODO: keep a list of challanges
 
     function challenge(
         bytes32 _entropy,
