@@ -40,7 +40,7 @@ export default class extends LoggedInPage {
         </div>
 
         <div className="ebp-page">
-          <h3 className="text-center">User's Info</h3>
+          <h3 className="text-center">Random Number Genertor</h3>
           <div className="ant-col-md-18 ant-col-md-offset-3 text-alert" style={{ 'textAlign': 'left' }}>
 
             <Row>
@@ -165,7 +165,7 @@ export default class extends LoggedInPage {
     return (
       <Breadcrumb style={{ 'marginLeft': '16px', 'marginTop': '16px', float: 'right' }}>
         <Breadcrumb.Item><Link to="/unbiasable"><Icon type="home" /> Home</Link></Breadcrumb.Item>
-        <Breadcrumb.Item>unbiasable</Breadcrumb.Item>
+        <Breadcrumb.Item>RNG</Breadcrumb.Item>
       </Breadcrumb>
     )
   }

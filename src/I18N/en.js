@@ -1,7 +1,7 @@
 export default {
   // Header
   '0001': 'User',
-  '0002': 'unbiasable',
+  '0002': 'RNG',
   '0003': 'Pool',
   '0004': 'Pool Control',
   '0005': 'Teams',
