@@ -17,12 +17,20 @@ const weiToNUSD = (wei) => {
   return Number(wei / (10 ** (DECIMALS.nusd))).toFixed(4)
 }
 
+const entropyToSeed = (entropy) => {
+  // return web3.utils.keccak256(web3.eth.abi.encodeParameters(
+  //   ['address', 'bytes32'],
+  //   [this.props.wallet, entropy]
+  // ));
+}
+
 const weiToMNTY = (wei) => {
   return (Number(web3.utils.fromWei(wei.toString())) / 1000000).toFixed(4)
 }
 
 export default class extends LoggedInPage {
   state = {
+    entropy: "",
     data: [],
     copied: false,
     amount: 0,
@@ -40,108 +48,67 @@ export default class extends LoggedInPage {
         </div>
 
         <div className="ebp-page">
-          <h3 className="text-center">Random Number Genertor</h3>
+          <h3 className="text-center">Random Number Generator</h3>
           <div className="ant-col-md-18 ant-col-md-offset-3 text-alert" style={{ 'textAlign': 'left' }}>
 
             <Row>
               <Col span={6}>
-                Wallet:
+                Wallet
               </Col>
-              <Col span={6}>
+              <Col span={18}>
                 {this.props.wallet}
               </Col>
             </Row>
 
             <Row>
               <Col span={6}>
-                Balance:
+                Balance
               </Col>
-              <Col span={6}>
+              <Col span={18}>
                 {weiToMNTY(this.props.balance)} MNTY
               </Col>
-            </Row>
-
-            <Row>
-              <Col span={2}>
-                Amount
-              </Col>
-              <Col span={1}/>
-              <Col span={8}>
-                <InputNumber className="maxWidth"
-                  defaultValue={0}
-                  value={this.state.transferAmount}
-                  onChange={this.transferAmountChange.bind(this)}
-                />
-              </Col>
-              <Col span={1}/>
-              <Col span={2}>
-                to
-              </Col>
-              <Col span={1}/>
-              <Col span={8}>
-                <Input className="maxWidth"
-                  defaultValue={0}
-                  value={this.state.toWallet}
-                  onChange={this.toWalletChange.bind(this)}
-                />
-              </Col>
-              <Col span={1}/>
             </Row>
 
             <div className="ebp-header-divider dashboard-rate-margin">
             </div>
 
-            <Row>
-              <Col span={2}>
-                Amount
+            <Row style={{ 'marginTop': '15px' }}>
+              <Col span={6}>
+                Entropy
               </Col>
-              <Col span={1}/>
-              <Col span={8}>
+              <Col span={18}>
                 <Input className="maxWidth"
                   defaultValue={0}
-                  value={this.state.amount}
-                  onChange={this.amountChange.bind(this)}
+                  value={this.state.entropy}
+                  onChange={this.entropyChange.bind(this)}
                 />
               </Col>
-              <Col span={1}/>
-              <Col span={2}>
-                Price
-              </Col>
-              <Col span={1}/>
-              <Col span={8}>
-                <Input className="maxWidth"
-                  defaultValue={0}
-                  value={this.state.price}
-                  onChange={this.priceChange.bind(this)}
-                />
-              </Col>
-              <Col span={1}/>
             </Row>
 
             <Row style={{ 'marginTop': '15px' }}>
-              <Col span={2}>
-                Id
+              <Col span={6}>
+                T (blocks)
               </Col>
-              <Col span={1}/>
-              <Col span={8}>
+              <Col span={6}>
                 <InputNumber className="maxWidth"
                   defaultValue={0}
                   value={this.state.id}
-                  onChange={this.idChange.bind(this)}
+                  //onChange={this.idChange.bind(this)}
                 />
+              </Col>
+              <Col span={6}/>
+              <Col span={6}>
+                <Button onClick={() => this.remove(false)} type="primary" className="btn-margin-top submit-button maxWidth">Challenge</Button>
               </Col>
             </Row>
 
             <Row style={{ 'marginTop': '15px' }}>
-              <Col span={0}/>
-              <Col span={12}>
-                <Button onClick={() => this.remove(false)} type="primary" className="btn-margin-top submit-button maxWidth">Selling Order Remove</Button>
+              <Col span={6}>
+                Seed
               </Col>
-              <Col span={0}/>
-              <Col span={12}>
-                <Button onClick={() => this.remove(true)} type="primary" className="btn-margin-top submit-button maxWidth">Buying Order Remove</Button>
+              <Col span={18}>
+                {}
               </Col>
-              <Col span={0}/>
             </Row>
 
             <div className="ebp-header-divider dashboard-rate-margin">
@@ -179,9 +146,9 @@ remove(_orderType) {
   };
 
 
-idChange(e) {
+entropyChange(e) {
     this.setState({
-        id: e.target.value
+        entropy: e.target.value
     })
 }
 
