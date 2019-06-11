@@ -30,8 +30,13 @@ export default class extends BaseService {
                     .call()
                     .then((seed) => {
                         console.log('seed', seed)
-                        const unbiasableRedux = this.store.getRedux('unbiasable')
-                        this.dispatch(unbiasableRedux.actions.seed_update(seed))
+                        methods.getIteration(seed)
+                            .call()
+                            .then((iteration) => {
+                                const unbiasableRedux = this.store.getRedux('unbiasable')
+                                this.dispatch(unbiasableRedux.actions.seed_update(seed))
+                                this.dispatch(unbiasableRedux.actions.iteration_update(iteration))
+                            })
                     })
             })
             // .on('receipt', (receipt) => {

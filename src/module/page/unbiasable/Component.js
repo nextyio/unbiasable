@@ -36,7 +36,6 @@ export default class extends LoggedInPage {
   state = {
     entropy: "",
     duration: 0,
-    seed: "",
   }
 
   async componentDidMount() {
@@ -104,19 +103,24 @@ export default class extends LoggedInPage {
               </Col>
             </Row>
 
-            <Row style={{ 'marginTop': '15px' }}>
-              <Col span={6}>
-                Seed
-              </Col>
-              <Col span={18}>
-                {
-                  this.props.seed &&
-                  <CopyToClipboard text={this.props.seed}>
-                    <Button>{shorten(this.props.seed)}</Button>
+            { (this.props.seed && this.props.iteration) &&
+              <Row style={{ 'marginTop': '15px' }}>
+                <Col span={6}>
+                  Seed
+                </Col>
+                <Col span={8}>
+                  {shorten(this.props.seed)}
+                </Col>
+                <Col span={6}>
+                  Iteration: {this.props.iteration}
+                </Col>
+                <Col span={4}>
+                  <CopyToClipboard text={this.props.seed.substr(2) + " " + this.props.t}>
+                    <Button className="maxWidth">Copy</Button>
                   </CopyToClipboard>
-                }
-              </Col>
-            </Row>
+                </Col>
+              </Row>
+            }
 
             <div className="ebp-header-divider dashboard-rate-margin">
             </div>
@@ -153,12 +157,6 @@ export default class extends LoggedInPage {
   durationChange(duration) {
     this.setState({
       duration: duration
-    })
-  }
-
-  seedChange(seed) {
-    this.setState({
-      seed: seed
     })
   }
 

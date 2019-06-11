@@ -30,6 +30,7 @@ export default createContainer(Component, (state) => {
     wallet: state.user.wallet,
     balance: state.user.balance,
     seed: state.unbiasable.seed,
+    iteration: state.unbiasable.iteration,
   }
 }, () => {
   const userService = new UserService()

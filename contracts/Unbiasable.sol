@@ -100,6 +100,16 @@ contract Unbiasable {
         return sha256(abi.encodePacked(maker, entropy));
     }
 
+    function getIteration(
+        bytes32 seed
+    )
+        public
+        view
+        returns (uint256)
+    {
+        return challenges[seed].t;
+    }
+
     function state(
         Challenge storage c
     )

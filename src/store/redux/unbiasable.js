@@ -7,7 +7,8 @@ class UnbiasableRedux extends BaseRedux {
 
     defineDefaultState () {
         return {
-            seed: ""
+            seed: "",
+            iteration: 0,
         };
     }
 }
