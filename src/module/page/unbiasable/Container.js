@@ -1,7 +1,7 @@
 import { createContainer } from '@/util'
 import Component from './Component'
 import UserService from '@/service/UserService'
-import UnbiasableService from '@/service/contracts/unbiasable'
+import UnbiasableService from '@/service/contracts/unbiasableService'
 var curWallet = null
 export default createContainer(Component, (state) => {
   const userService = new UserService()
@@ -29,6 +29,7 @@ export default createContainer(Component, (state) => {
   return {
     wallet: state.user.wallet,
     balance: state.user.balance,
+    seed: state.unbiasable.seed,
   }
 }, () => {
   const userService = new UserService()
@@ -38,6 +39,9 @@ export default createContainer(Component, (state) => {
     // TEST
     async reload() {
       return await unbiasableService.reload()
-    }
+    },
+    async challenge(entropy, duration) {
+      return await unbiasableService.challenge(entropy, duration)
+    },
   }
 })

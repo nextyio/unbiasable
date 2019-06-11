@@ -73,7 +73,7 @@ contract Unbiasable {
         returns (bytes32 seed)
     {
         require(_entropy != 0x0, "Must provide entropy.");
-        seed = sha256(abi.encodePacked(msg.sender, _entropy));
+        seed = calcSeed(msg.sender, _entropy);
         require(challenges[seed].maker == address(0x0), "Duplicated challenge.");
         uint256 Tv = Math.max(_T * vDividend / vDivisor, MinV);
         uint256 Te = _T - Tv;
@@ -87,6 +87,17 @@ contract Unbiasable {
         challenges[seed].t = Te * minSpeed;
 
         return seed;
+    }
+
+    function calcSeed(
+        address maker,
+        bytes32 entropy
+    )
+        public
+        pure
+        returns (bytes32 seed)
+    {
+        return sha256(abi.encodePacked(maker, entropy));
     }
 
     function state(

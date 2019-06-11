@@ -9,6 +9,39 @@ var BigNumber = require('bignumber.js');
 
 export default class extends BaseService {
 
+    async challenge(_entropy, _duration) {
+        const store = this.store.getState()
+        let wallet = store.user.wallet
+        let methods = store.contracts.unbiasable.methods
+        let entropyHex = web3.fromAscii(_entropy);
+        console.log('entropy', _entropy, 'hex', entropyHex)
+        // send the transaction
+        methods.challenge(entropyHex, _duration.toString())
+            .send({from: wallet})
+            .on('error', (error) => {
+                console.error(error)
+                const unbiasableRedux = this.store.getRedux('unbiasable')
+                this.dispatch(unbiasableRedux.actions.seed_reset())
+            })
+            .on('transactionHash', (hash) => {
+                console.log('tx hash', hash)
+                // preemptively update the UI
+                methods.calcSeed(wallet, entropyHex)
+                    .call()
+                    .then((seed) => {
+                        console.log('seed', seed)
+                        const unbiasableRedux = this.store.getRedux('unbiasable')
+                        this.dispatch(unbiasableRedux.actions.seed_update(seed))
+                    })
+            })
+            // .on('receipt', (receipt) => {
+            //     console.log(receipt)
+            // })
+            // .on('confirmation', (number, receipt) => {
+            //     // TODO: mark the button confirmed here
+            // })
+    }
+
     async getOrder(_orderType, _id) {
         const store = this.store.getState()
         let methods = store.contracts.unbiasable.methods
@@ -40,6 +73,7 @@ export default class extends BaseService {
 
     async reload () {
         const unbiasableRedux = this.store.getRedux('unbiasable')
-        await this.dispatch(unbiasableRedux.actions.orders_reset())
+        console.log(unbiasableRedux.actions)
+        await this.dispatch(unbiasableRedux.actions.seed_reset())
     }
 }

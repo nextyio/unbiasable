@@ -17,6 +17,10 @@ const weiToNUSD = (wei) => {
   return Number(wei / (10 ** (DECIMALS.nusd))).toFixed(4)
 }
 
+const shorten = (str) => {
+  return str.substr(0,8) + '..' + str.substr(-6)
+}
+
 const entropyToSeed = (entropy) => {
   // return web3.utils.keccak256(web3.eth.abi.encodeParameters(
   //   ['address', 'bytes32'],
@@ -31,10 +35,8 @@ const weiToMNTY = (wei) => {
 export default class extends LoggedInPage {
   state = {
     entropy: "",
-    data: [],
-    copied: false,
-    amount: 0,
-    price: 0
+    duration: 0,
+    seed: "",
   }
 
   async componentDidMount() {
@@ -92,13 +94,13 @@ export default class extends LoggedInPage {
               <Col span={6}>
                 <InputNumber className="maxWidth"
                   defaultValue={0}
-                  value={this.state.id}
-                  //onChange={this.idChange.bind(this)}
+                  value={this.state.duration}
+                  onChange={this.durationChange.bind(this)}
                 />
               </Col>
               <Col span={6}/>
               <Col span={6}>
-                <Button onClick={() => this.remove(false)} type="primary" className="btn-margin-top submit-button maxWidth">Challenge</Button>
+                <Button onClick={() => this.challenge()} type="primary" className="btn-margin-top submit-button maxWidth">Challenge</Button>
               </Col>
             </Row>
 
@@ -107,7 +109,12 @@ export default class extends LoggedInPage {
                 Seed
               </Col>
               <Col span={18}>
-                {}
+                {
+                  this.props.seed &&
+                  <CopyToClipboard text={this.props.seed}>
+                    <Button>{shorten(this.props.seed)}</Button>
+                  </CopyToClipboard>
+                }
               </Col>
             </Row>
 
@@ -137,42 +144,25 @@ export default class extends LoggedInPage {
     )
   }
 
-remove(_orderType) {
-  return this.props.remove(_orderType, this.state.id)
-}
-
-  onCopy = () => {
-    this.setState({copied: true});
-  };
-
-
-entropyChange(e) {
+  entropyChange(e) {
     this.setState({
-        entropy: e.target.value
+      entropy: e.target.value
     })
-}
+  }
 
-toWalletChange(e) {
+  durationChange(duration) {
     this.setState({
-        toWallet: e.target.value
+      duration: duration
     })
-}
+  }
 
-transferAmountChange(amount) {
+  seedChange(seed) {
     this.setState({
-        transferAmount: amount
+      seed: seed
     })
-}
+  }
 
-amountChange(e) {
-    this.setState({
-        amount: e.target.value
-    })
-}
-
-priceChange(e) {
-    this.setState({
-        price: e.target.value
-    })
-}
+  challenge() {
+    this.props.challenge(this.state.entropy, this.state.duration);
+  }
 }
