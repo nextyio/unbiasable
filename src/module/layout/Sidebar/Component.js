@@ -91,8 +91,14 @@ export default class extends BaseComponent {
         />
 
         <Menu onClick={this.clickItem.bind(this)} theme="dark" mode="inline" className="menu-sidebar" defaultSelectedKeys={this.detectUrl()}>
-          <Menu.Item key="Unbiasable">
-            <Icon type="credit-card" /> {I18N.get('0002')}
+          <Menu.Item key="home">
+            <Icon type="question-circle" /> {I18N.get('0002')}
+          </Menu.Item>
+          <Menu.Item key="manual">
+            <Icon type="calculator" /> {I18N.get('0017')}
+          </Menu.Item>
+          <Menu.Item key="auto">
+            <Icon type="setting" class="anticon-spin" /> {I18N.get('0018')}
           </Menu.Item>
         </Menu>
       </Sider>
@@ -103,7 +109,8 @@ export default class extends BaseComponent {
     const key = e.key
     if (_.includes([
       'home',
-      'unbiasable'
+      'manual',
+      'auto',
     ], key)) {
       this.props.history.push('/' + e.key)
     } else if (key === 'logout') {
@@ -127,7 +134,9 @@ export default class extends BaseComponent {
 
     let sidebar = [
       'home',
-      'unbiasable'
+      'unbiasable',
+      'manual',
+      'auto',
     ]
 
     if (!url) {
