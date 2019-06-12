@@ -48,7 +48,7 @@ export default class extends BaseComponent {
   }
 
   componentDidMount () {
-    document.title = 'Nexty ...'
+    document.title = 'Nexty Unbiasable RNG'
     window.addEventListener('resize', this.updateDimensions)
     this.loadData()
   }
