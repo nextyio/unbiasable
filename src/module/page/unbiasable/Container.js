@@ -1,21 +1,13 @@
 import { createContainer } from '@/util'
 import Component from './Component'
-import UserService from '@/service/UserService'
 import UnbiasableService from '@/service/contracts/unbiasableService'
 var curWallet = null
 export default createContainer(Component, (state) => {
-  const userService = new UserService()
-  const unbiasableService = new UnbiasableService()
-
   async function loadOnInit () {
     load()
-    // unbiasableService.loadOrders(true)
-    // unbiasableService.loadOrders(false)
   }
 
   async function load () {
-    userService.loadBlockNumber()
-    userService.getBalance()
   }
 
   if (state.user.wallet !== curWallet && !curWallet) {
@@ -33,7 +25,6 @@ export default createContainer(Component, (state) => {
     iteration: state.unbiasable.iteration,
   }
 }, () => {
-  const userService = new UserService()
   const unbiasableService = new UnbiasableService()
 
   return {
