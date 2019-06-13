@@ -28,7 +28,7 @@ export default class extends StandardPage {
 
   ord_checkLogin (isLogin) { // eslint-disable-line
     if (isLogin) {
-      this.props.history.replace('/manage')
+      this.props.history.replace('/home')
     }
   }
 }
