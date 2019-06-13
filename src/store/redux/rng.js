@@ -1,8 +1,8 @@
 import BaseRedux from '@/model/BaseRedux';
 
-class UnbiasableRedux extends BaseRedux {
+class RNGRedux extends BaseRedux {
     defineTypes () {
-        return ['unbiasable'];
+        return ['rng'];
     }
 
     defineDefaultState () {
@@ -13,4 +13,4 @@ class UnbiasableRedux extends BaseRedux {
     }
 }
 
-export default new UnbiasableRedux()
+export default new RNGRedux()

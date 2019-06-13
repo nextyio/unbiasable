@@ -21,13 +21,13 @@ export default class extends BaseService {
             .send({from: wallet})
             .on('error', (error) => {
                 console.error(error)
-                const unbiasableRedux = this.store.getRedux('unbiasable')
+                const unbiasableRedux = this.store.getRedux('rng')
                 this.dispatch(unbiasableRedux.actions.seed_reset())
             })
             .on('transactionHash', (hash) => {
                 console.log('tx hash', hash)
                 // preemptively update the UI
-                let unbiasableRedux = this.store.getRedux('unbiasable')
+                let unbiasableRedux = this.store.getRedux('rng')
                 this.dispatch(unbiasableRedux.actions.seed_update(seed))
             })
             .on('receipt', (receipt) => {
@@ -36,7 +36,7 @@ export default class extends BaseService {
                     .call()
                     .then((iteration) => {
                         console.log('iteration', iteration)
-                        let unbiasableRedux = this.store.getRedux('unbiasable')
+                        let unbiasableRedux = this.store.getRedux('rng')
                         this.dispatch(unbiasableRedux.actions.seed_update(seed))
                         this.dispatch(unbiasableRedux.actions.iteration_update(iteration))
                     })
@@ -44,7 +44,7 @@ export default class extends BaseService {
     }
 
     async reload () {
-        const unbiasableRedux = this.store.getRedux('unbiasable')
+        const unbiasableRedux = this.store.getRedux('rng')
         console.log(unbiasableRedux.actions)
         await this.dispatch(unbiasableRedux.actions.seed_reset())
     }

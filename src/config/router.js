@@ -1,4 +1,4 @@
-import UnbiasablePage from '@/module/page/unbiasable/Container'
+import RNGPage from '@/module/page/rng/Container'
 import ManualPage from '@/module/page/manual/Container'
 
 import LoginPage from '@/module/page/login/Container'
@@ -12,7 +12,7 @@ export default [
   },
   {
     path: '/home',
-    page: UnbiasablePage
+    page: RNGPage
   },
   {
     path: '/manual',

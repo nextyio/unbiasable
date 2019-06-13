@@ -38,7 +38,7 @@ export default class extends BaseService {
                     .then((state) => {
                         console.log('state', web3.utils.toUtf8(state));
                     })
-                const unbiasableRedux = this.store.getRedux('unbiasable')
+                const unbiasableRedux = this.store.getRedux('rng')
                 this.dispatch(unbiasableRedux.actions.seed_reset())
             })
             .on('receipt', (receipt) => {

@@ -48,7 +48,7 @@ export default class extends BaseComponent {
   }
 
   componentDidMount () {
-    document.title = 'Nexty Unbiasable RNG'
+    document.title = 'Unbiasable RNG'
     window.addEventListener('resize', this.updateDimensions)
     this.loadData()
   }
@@ -134,13 +134,13 @@ export default class extends BaseComponent {
 
     let sidebar = [
       'home',
-      'unbiasable',
+      'rng',
       'manual',
       'auto',
     ]
 
     if (!url) {
-      return ['unbiasable']
+      return ['rng']
     }
 
     for (var menu in sidebar) {
