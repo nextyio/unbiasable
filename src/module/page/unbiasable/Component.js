@@ -103,19 +103,34 @@ export default class extends LoggedInPage {
               </Col>
             </Row>
 
-            { (this.props.seed && this.props.iteration) &&
+            { this.props.seed &&
               <Row style={{ 'marginTop': '15px' }}>
                 <Col span={6}>
                   Seed
                 </Col>
-                <Col span={8}>
+                <Col span={14}>
                   {shorten(this.props.seed)}
                 </Col>
+                <Col span={4}>
+                  <CopyToClipboard text={this.props.seed.substr(2)}>
+                    <Button className="maxWidth">Copy</Button>
+                  </CopyToClipboard>
+                </Col>
+              </Row>
+            }
+
+            { this.props.iteration > 0 &&
+              <Row style={{ 'marginTop': '15px' }}>
                 <Col span={6}>
-                  Iteration: {this.props.iteration}
+                  Iteration
+                </Col>
+                <Col span={6}>
+                  {this.props.iteration}
+                </Col>
+                <Col span={8}>
                 </Col>
                 <Col span={4}>
-                  <CopyToClipboard text={this.props.seed.substr(2) + " " + this.props.t}>
+                  <CopyToClipboard text={this.props.iteration}>
                     <Button className="maxWidth">Copy</Button>
                   </CopyToClipboard>
                 </Col>
