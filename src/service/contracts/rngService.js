@@ -1,7 +1,7 @@
 import BaseService from '../../model/BaseService'
 import _ from 'lodash'
 import { empty } from 'glamor';
-import { cutString, weiToMNTY, weiToEthS} from './help'
+import { cutString, weiToCoin, weiToEthS} from './help'
 import { DECIMALS } from '@/constant'
 
 // var BigNumber = require('big-number');

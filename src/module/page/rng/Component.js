@@ -28,8 +28,8 @@ const entropyToSeed = (entropy) => {
   // ));
 }
 
-const weiToMNTY = (wei) => {
-  return (Number(web3.utils.fromWei(wei.toString())) / 1000000).toFixed(4)
+const weiToCoin = (wei) => {
+  return (Number(web3.utils.fromWei(wei.toString()))).toFixed(4)
 }
 
 export default class extends LoggedInPage {
@@ -66,7 +66,7 @@ export default class extends LoggedInPage {
                 Balance
               </Col>
               <Col span={18}>
-                {weiToMNTY(this.props.balance)} MNTY
+                {weiToCoin(this.props.balance)} Coin
               </Col>
             </Row>
 
