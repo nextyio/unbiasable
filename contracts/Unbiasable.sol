@@ -100,6 +100,27 @@ contract Unbiasable {
         return sha256(abi.encodePacked(maker, entropy));
     }
 
+    function calcProofHash(
+        bytes32[18] memory input // seed + t + proof[16]
+    )
+        public
+        pure
+        returns (bytes32 proofHash)
+    {
+        return sha256(abi.encodePacked(input));
+    }
+
+    function calcProofCommit(
+        address evaluator,
+        bytes32 proofHash
+    )
+        public
+        pure
+        returns (bytes32 proofCommit)
+    {
+        return sha256(abi.encodePacked(evaluator, proofHash));
+    }
+
     function getIteration(
         bytes32 seed
     )
@@ -135,6 +156,24 @@ contract Unbiasable {
         return State.SUCCESS;
     }
 
+    function getState(
+        bytes32 seed
+    )
+        public
+        view
+        returns (bytes32)
+    {
+        Challenge storage c = challenges[seed];
+        State s = state(c);
+        if (s == State.NONE) return "NONE";
+        if (s == State.EVAL) return "EVAL";
+        if (s == State.VERIFY) return "VERIFY";
+        if (s == State.SUCCESS) return "SUCCESS";
+        if (s == State.TIMEOUT) return "TIMEOUT";
+        if (s == State.FAIL) return "FAIL";
+        return "UNKNOW";
+    }
+
     function commit(
         bytes32 seed,
         bytes32 proofCommit
@@ -142,10 +181,7 @@ contract Unbiasable {
         public
     {
         Challenge storage c = challenges[seed];
-        require(c.maker != address(0x0), "No such challenge.");
-        require(block.number <= c.C + c.Te, "Evaluation time is over.");
-        require(c.validProofHash != 0x0, "Proof is already verified.");
-        //require(state(c) == State.EVAL, "Not in evaluation phase.");
+        require(state(c) == State.EVAL, "Not in evaluation phase.");
         Commit memory cm = Commit({
             evaluator: msg.sender,
             number: block.number,
@@ -165,7 +201,7 @@ contract Unbiasable {
         Challenge storage c = challenges[seed];
         require(c.t == uint256(input[1]), "No such challenge.");
         // just hash the whole input for simplicity, technically only proof is needed here
-        bytes32 proofHash = sha256(abi.encodePacked(input));
+        bytes32 proofHash = calcProofHash(input);
         require(c.validProofHash != proofHash, "Proof already verified.");
         assembly {
             // call vdfVerify precompile
@@ -198,7 +234,7 @@ contract Unbiasable {
         // Remove invalid commits
         for (uint i = 0; i<c.commits.length; ++i) {
             Commit storage cm = c.commits[i];
-            bytes32 proofCommit = sha256(abi.encodePacked(cm.evaluator,c.validProofHash));
+            bytes32 proofCommit = calcProofCommit(cm.evaluator, c.validProofHash);
             if (proofCommit != cm.proofCommit) {
                 // invalid commit
                 c.commits[i] = c.commits[c.commits.length-1];

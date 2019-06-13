@@ -1,21 +1,14 @@
 import { createContainer } from '@/util'
 import Component from './Component'
-import UserService from '@/service/UserService'
-import UnbiasableService from '@/service/contracts/unbiasableService'
+import ManualService from '@/service/contracts/manualService'
+
 var curWallet = null
 export default createContainer(Component, (state) => {
-  const userService = new UserService()
-  const unbiasableService = new UnbiasableService()
-
   async function loadOnInit () {
     load()
-    // unbiasableService.loadOrders(true)
-    // unbiasableService.loadOrders(false)
   }
 
   async function load () {
-    userService.loadBlockNumber()
-    userService.getBalance()
   }
 
   if (state.user.wallet !== curWallet && !curWallet) {
@@ -29,20 +22,15 @@ export default createContainer(Component, (state) => {
   return {
     wallet: state.user.wallet,
     balance: state.user.balance,
-    seed: state.unbiasable.seed,
-    iteration: state.unbiasable.iteration,
+    evaluating: state.manual.evaluating,
+    proof: state.manual.proof,
   }
 }, () => {
-  const userService = new UserService()
-  const unbiasableService = new UnbiasableService()
+  const manualService = new ManualService()
 
   return {
-    // TEST
-    async reload() {
-      return await unbiasableService.reload()
-    },
-    async challenge(entropy, duration) {
-      return await unbiasableService.challenge(entropy, duration)
+    async commit(seed, iteration, proof) {
+      return await manualService.commit(seed, iteration, proof)
     },
   }
 })

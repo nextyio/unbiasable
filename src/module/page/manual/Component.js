@@ -29,7 +29,7 @@ export default class extends LoggedInPage {
   state = {
     seed: "",
     iteration: 0,
-    evaluating: false,
+    proof: "",
   }
 
   async componentDidMount() {
@@ -79,7 +79,6 @@ export default class extends LoggedInPage {
                 />
               </Col>
             </Row>
-
             <Row style={{ 'marginTop': '15px' }}>
               <Col span={6}>
                 Iteration
@@ -87,25 +86,29 @@ export default class extends LoggedInPage {
               <Col span={12}>
                 <InputNumber className="maxWidth"
                   defaultValue={0}
-                  value={this.state.duration}
-                  onChange={this.durationChange.bind(this)}
+                  value={this.state.iteration}
+                  onChange={this.iterationChange.bind(this)}
                 />
               </Col>
             </Row>
 
             <Row style={{ 'marginTop': '15px' }}>
               <Col span={6}>
-                { this.state.evaluating &&
-                  <Icon type="setting" style={{ fontSize: '32px' }} class="anticon-spin" /> ||
-                  <Icon type="setting" style={{ fontSize: '32px' }} /> }
+                Proof
               </Col>
               <Col span={18}>
-                <Button onClick={() => this.evaluate()} type="primary" className="btn-margin-top submit-button maxWidth">Evaluate</Button>
+                <Input.TextArea className="maxWidth"
+                  value={this.state.proof}
+                  onChange={this.proofChange.bind(this)}
+                />
               </Col>
             </Row>
 
-            <div className="ebp-header-divider dashboard-rate-margin">
-            </div>
+            <Row style={{ 'marginTop': '15px' }}>
+              <Col span={24}>
+                <Button onClick={() => this.commit()} type="primary" className="btn-margin-top submit-button maxWidth">Commit</Button>
+              </Col>
+            </Row>
 
             <div className="ebp-header-divider dashboard-rate-margin">
             </div>
@@ -126,24 +129,23 @@ export default class extends LoggedInPage {
 
   seedChange(e) {
     this.setState({
-      entropy: e.target.value
+      seed: e.target.value
     })
   }
 
-  durationChange(duration) {
+  iterationChange(iteration) {
     this.setState({
-      duration: duration
+      iteration: iteration
     })
   }
 
-  toggleEvaluation() {
+  proofChange(e) {
     this.setState({
-      evaluating: !this.state.evaluating
+      proof: e.target.value
     })
   }
   
-  evaluate() {
-    this.toggleEvaluation()
-    //this.props.challenge(this.state.entropy, this.state.duration);
+  commit() {
+    this.props.commit(this.state.seed, this.state.iteration, this.state.proof);
   }
 }

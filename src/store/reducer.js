@@ -4,6 +4,7 @@ import { routerReducer } from 'react-router-redux'
 import task from './redux/task'
 import user from './redux/user'
 import unbiasable from './redux/unbiasable'
+import manual from './redux/manual'
 import contracts from './redux/contracts'
 import community from './redux/community'
 
@@ -26,5 +27,6 @@ export default combineReducers({
   contracts: contracts.getReducer(),
   user: user.getReducer(),
   unbiasable: unbiasable.getReducer(),
+  manual: manual.getReducer(),
   community: community.getReducer()
 })

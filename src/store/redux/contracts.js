@@ -8,7 +8,8 @@ class ContractRedux extends BaseRedux {
   defineDefaultState () {
     return {
       web3: null,
-      unbiasable: null
+      unbiasable: null,
+      manual: null,
     }
   }
 }
