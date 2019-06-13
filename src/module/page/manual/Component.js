@@ -105,13 +105,21 @@ export default class extends LoggedInPage {
             </Row>
 
             <Row style={{ 'marginTop': '15px' }}>
-              <Col span={24}>
+              <Col span={3}></Col>
+              <Col span={18}>
                 <Button onClick={() => this.commit()} type="primary" className="btn-margin-top submit-button maxWidth">Commit</Button>
               </Col>
+              <Col span={3}></Col>
             </Row>
 
             <div className="ebp-header-divider dashboard-rate-margin">
             </div>
+
+            <Row style={{ 'marginTop': '15px' }}>
+              <Col span={24}>
+                <Button onClick={() => this.verify()} type="primary" className="btn-margin-top submit-button maxWidth">Verify</Button>
+              </Col>
+            </Row>
           </div>
         </div>
       </div>
@@ -147,5 +155,9 @@ export default class extends LoggedInPage {
   
   commit() {
     this.props.commit(this.state.seed, this.state.iteration, this.state.proof);
+  }
+
+  verify() {
+    this.props.verify(this.state.seed, this.state.iteration, this.state.proof);
   }
 }

@@ -32,5 +32,8 @@ export default createContainer(Component, (state) => {
     async commit(seed, iteration, proof) {
       return await manualService.commit(seed, iteration, proof)
     },
+    async verify(seed, iteration, proof) {
+      return await manualService.verify(seed, iteration, proof)
+    },
   }
 })
