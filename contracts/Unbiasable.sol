@@ -131,6 +131,17 @@ contract Unbiasable {
         return challenges[seed].t;
     }
 
+    // FOR TEST
+    function getChallengeData(
+        bytes32 seed
+    )
+        public view
+        returns (address, bytes32, uint256, uint256, uint256, uint256, uint256, bytes32)
+    {
+        Challenge storage c = challenges[seed];
+        return (c.maker, c.entropy, c.C, c.T, c.Te, c.t, c.commits.length, c.validProofHash);
+    }
+
     function state(
         Challenge storage c
     )
@@ -190,7 +201,30 @@ contract Unbiasable {
         c.commits.push(cm);
     }
 
-    function verify(
+    // FOR TEST
+    function isValid(
+        bytes32[18] memory input // seed + t + proof[16]
+    )
+        pure
+        public
+        returns(bool)
+    {
+        return (input[2] & bytes32(0xFF00000000000000000000000000000000000000000000000000000000000000)) == bytes32(0x0);
+    }
+
+    // FOR TEST
+    function testInputItertion(
+        bytes32[18] memory input // seed + t + proof[16]
+    )
+        pure
+        public
+        returns(uint256)
+    {
+        return uint256(input[1]);
+    }
+
+    // FOR TEST
+    function testVerify(
         bytes32[18] memory input // seed + t + proof[16]
     )
         public
@@ -203,16 +237,31 @@ contract Unbiasable {
         // just hash the whole input for simplicity, technically only proof is needed here
         bytes32 proofHash = calcProofHash(input);
         require(c.validProofHash != proofHash, "Proof already verified.");
-        assembly {
-            // call vdfVerify precompile
-            if iszero(call(not(0), 0xFF, 0, input, 576, valid, 1)) {
-                revert(0, 0)
-            }
-        }
-        if (!valid) {
-            // not a valid proof
-            return false;
-        }
+        valid = isValid(input);
+        return valid;
+    }
+
+    function verify(
+        bytes32[18] memory input // seed + t + proof[16]
+    )
+        public
+        payable
+        returns(bool success)
+    {
+        bytes32 seed = input[0];
+        Challenge storage c = challenges[seed];
+        require(c.t == uint256(input[1]), "No such challenge.");
+        // just hash the whole input for simplicity, technically only proof is needed here
+        bytes32 proofHash = calcProofHash(input);
+        require(c.validProofHash != proofHash, "Proof already verified.");
+        bool valid = isValid(input);
+        // assembly {
+        //     // call vdfVerify precompile
+        //     if iszero(call(not(0), 0xFF, 0, input, 576, valid, 1)) {
+        //         revert(0, 0)
+        //     }
+        // }
+        require(valid, "Not a valid proof");
         if (c.validProofHash != 0x0) {
             // multiple valid proofs, ABORT!
             c.entropy = 0x0; // clear the entropy to signal an aborted challenge
@@ -221,6 +270,22 @@ contract Unbiasable {
         // record the first valid proof
         c.validProofHash = proofHash;
         return true;
+    }
+
+    // FOR TEST
+    function vdfTest(
+        bytes32[18] memory input // seed + t + proof[16]
+    )
+        public
+        returns(bool valid)
+    {
+        assembly {
+            // call vdfVerify precompile
+            if iszero(call(not(0), 0xFF, 0, input, 576, valid, 1)) {
+                revert(0, 0)
+            }
+        }
+        return valid;
     }
 
     function finalize(
