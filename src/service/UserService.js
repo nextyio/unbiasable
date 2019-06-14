@@ -10,14 +10,7 @@ export default class extends BaseService {
 
     let web3 = new Web3(new Web3.providers.HttpProvider(WEB3.HTTP))
 
-    const NTFToken = web3.eth.contract(WEB3.PAGE['NTFToken'].ABI)
-    const NTFTokenContract = NTFToken.at(WEB3.PAGE['NTFToken'].ADDRESS)
-
-    const NextyManager = web3.eth.contract(WEB3.PAGE['NextyManager'].ABI)
-    const NextyManagerContract = NextyManager.at(WEB3.PAGE['NextyManager'].ADDRESS)
     const contract = {
-      NTFToken: NTFTokenContract,
-      NextyManager: NextyManagerContract
     }
 
     const wallet = new WalletService(privatekey)
@@ -32,25 +25,8 @@ export default class extends BaseService {
 
     await this.dispatch(userRedux.actions.wallet_update(walletAddress))
 
-    // const owner = contract.owner()
-    /*
-        const owner = {
-            NTFToken: NTFTokenContract.owner(),
-            NextyManager : NextyManagerContract.owner()
-        }
-*/
-    // const owner = contract.owner()
     const contractAdress = {
-      NTFToken: WEB3.PAGE['NTFToken'].ADDRESS,
-      NextyManager: WEB3.PAGE['NextyManager'].ADDRESS
     }
-    // console.log("owner=" + owner)
-    // console.log("address=" + walletAddress)
-    /*
-        if (walletAddress === owner) {
-            await this.dispatch(userRedux.actions.is_admin_update(true))
-        }
-        */
     sessionStorage.setItem('contract-adress', contractAdress) // eslint-disable-line
     await this.dispatch(userRedux.actions.is_login_update(true))
     await this.dispatch(userRedux.actions.profile_update({
