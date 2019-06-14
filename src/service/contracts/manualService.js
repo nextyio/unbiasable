@@ -65,11 +65,6 @@ export default class extends BaseService {
             .then((isValid) => {
                 console.log('isValid', isValid);
             })
-        methods.testInputItertion(input)
-            .call()
-            .then((iteration) => {
-                console.log('iteration', iteration);
-            })
         methods.getState(seed)
             .call()
             .then((state) => {
@@ -89,7 +84,7 @@ export default class extends BaseService {
                 console.log('validProofHash', results[i++]);
             })
         methods.verify(input)
-            .send({from: wallet})
+            .send({from: wallet, gasLimit: 222000})
             .on('error', (error) => {
                 console.error(error)
             })
@@ -100,6 +95,6 @@ export default class extends BaseService {
                     .then((state) => {
                         console.log('state', web3.utils.toUtf8(state));
                     })
-            });
+                });
     }
 }

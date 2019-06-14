@@ -205,22 +205,11 @@ contract Unbiasable {
     function isValid(
         bytes32[18] memory input // seed + t + proof[16]
     )
-        pure
         public
+        pure
         returns(bool)
     {
         return (input[2] & bytes32(0xFF00000000000000000000000000000000000000000000000000000000000000)) == bytes32(0x0);
-    }
-
-    // FOR TEST
-    function testInputItertion(
-        bytes32[18] memory input // seed + t + proof[16]
-    )
-        pure
-        public
-        returns(uint256)
-    {
-        return uint256(input[1]);
     }
 
     // FOR TEST
@@ -228,8 +217,7 @@ contract Unbiasable {
         bytes32[18] memory input // seed + t + proof[16]
     )
         public
-        payable
-        returns(bool valid)
+        view
     {
         bytes32 seed = input[0];
         Challenge storage c = challenges[seed];
@@ -237,8 +225,8 @@ contract Unbiasable {
         // just hash the whole input for simplicity, technically only proof is needed here
         bytes32 proofHash = calcProofHash(input);
         require(c.validProofHash != proofHash, "Proof already verified.");
-        valid = isValid(input);
-        return valid;
+        bool valid = isValid(input);
+        require(valid, "Not a valid proof");
     }
 
     function verify(
@@ -254,13 +242,7 @@ contract Unbiasable {
         // just hash the whole input for simplicity, technically only proof is needed here
         bytes32 proofHash = calcProofHash(input);
         require(c.validProofHash != proofHash, "Proof already verified.");
-        bool valid = isValid(input);
-        // assembly {
-        //     // call vdfVerify precompile
-        //     if iszero(call(not(0), 0xFF, 0, input, 576, valid, 1)) {
-        //         revert(0, 0)
-        //     }
-        // }
+        bool valid = vdfVerify(input);
         require(valid, "Not a valid proof");
         if (c.validProofHash != 0x0) {
             // multiple valid proofs, ABORT!
@@ -271,21 +253,35 @@ contract Unbiasable {
         c.validProofHash = proofHash;
         return true;
     }
-
-    // FOR TEST
-    function vdfTest(
+    
+    function vdfVerify(
         bytes32[18] memory input // seed + t + proof[16]
     )
         public
         returns(bool valid)
     {
+        uint256 output;
         assembly {
+            // define pointer
+            let p := mload(0x20)
             // call vdfVerify precompile
-            if iszero(call(not(0), 0xFF, 0, input, 576, valid, 1)) {
+            if iszero(call(not(0), 0xFF, 0, input, 576, p, 0x20)) {
                 revert(0, 0)
             }
+            // return value
+            output := mload(p)
         }
-        return valid;
+        return output != 0;
+    }
+
+    // FOR TEST
+    function testVDF(
+        bytes32[18] memory input // seed + t + proof[16]
+    )
+        public
+    {
+        bool valid = vdfVerify(input);
+        require(valid, "Not a valid proof");
     }
 
     function finalize(
