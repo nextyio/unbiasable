@@ -9,6 +9,9 @@ class RNGRedux extends BaseRedux {
         return {
             seed: "",
             iteration: 0,
+            state: "",
+            commitCount: 0,
+            validProofHash: "",
         };
     }
 }

@@ -1,31 +1,15 @@
 import React from 'react' // eslint-disable-line
 import LoggedInPage from '../LoggedInPage'
-import Footer from '@/module/layout/Footer/Container' // eslint-disable-line
-import Tx from 'ethereumjs-tx' // eslint-disable-line
 import { Link } from 'react-router-dom' // eslint-disable-line
 import web3 from 'web3'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
-import { DECIMALS } from '@/constant'
 
 import './style.scss'
 
 import { Col, Row, Icon, Button, Breadcrumb, Table, Input, InputNumber } from 'antd' // eslint-disable-line
 
-var BigNumber = require('big-number');
-
-const weiToNUSD = (wei) => {
-  return Number(wei / (10 ** (DECIMALS.nusd))).toFixed(4)
-}
-
 const shorten = (str) => {
   return str.substr(0,8) + '..' + str.substr(-6)
-}
-
-const entropyToSeed = (entropy) => {
-  // return web3.utils.keccak256(web3.eth.abi.encodeParameters(
-  //   ['address', 'bytes32'],
-  //   [this.props.wallet, entropy]
-  // ));
 }
 
 const weiToCoin = (wei) => {
@@ -140,9 +124,44 @@ export default class extends LoggedInPage {
             <div className="ebp-header-divider dashboard-rate-margin">
             </div>
 
+            {
+              <Row style={{ 'marginTop': '15px' }}>
+                <Col span={6}>
+                  State
+                </Col>
+                <Col span={18}>
+                  {this.props.state}
+                </Col>
+              </Row>
+            }
+
+            {
+              <Row style={{ 'marginTop': '15px' }}>
+                <Col span={6}>
+                  Commit Count
+                </Col>
+                <Col span={18}>
+                  {this.props.commitCount}
+                </Col>
+              </Row>
+            }
+
+            {
+              <Row style={{ 'marginTop': '15px' }}>
+                <Col span={6}>
+                  Valid Proof Hash
+                </Col>
+                <Col span={18}>
+                  <Input.TextArea className="maxWidth"
+                    value={this.props.validProofHash}
+                  />
+                </Col>
+              </Row>
+            }
+
             <Row style={{ 'marginTop': '15px' }}>
               <Col span={24}>
-                <Button onClick={() => this.props.reload()} type="primary" className="btn-margin-top submit-button maxWidth">Reload</Button>
+                <Button onClick={() => this.reload()} type="primary" className="btn-margin-top submit-button maxWidth">Reload</Button>
               </Col>
             </Row>
 
@@ -177,5 +196,9 @@ export default class extends LoggedInPage {
 
   challenge() {
     this.props.challenge(this.state.entropy, this.state.duration);
+  }
+
+  reload() {
+    this.props.reload(this.state.entropy);
   }
 }

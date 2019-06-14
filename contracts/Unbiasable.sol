@@ -131,8 +131,7 @@ contract Unbiasable {
         return challenges[seed].t;
     }
 
-    // FOR TEST
-    function getChallengeData(
+    function getChallenge(
         bytes32 seed
     )
         public view
@@ -140,6 +139,18 @@ contract Unbiasable {
     {
         Challenge storage c = challenges[seed];
         return (c.maker, c.entropy, c.C, c.T, c.Te, c.t, c.commits.length, c.validProofHash);
+    }
+
+    function getCommit(
+        bytes32 seed,
+        uint256 i
+    )
+        public view
+        returns (uint256 number, address evaluator, bytes32 proofCommit)
+    {
+        Challenge storage c = challenges[seed];
+        Commit storage cm = c.commits[i];
+        return (cm.number, cm.evaluator, cm.proofCommit);
     }
 
     function state(
@@ -253,7 +264,7 @@ contract Unbiasable {
         c.validProofHash = proofHash;
         return true;
     }
-    
+
     function vdfVerify(
         bytes32[18] memory input // seed + t + proof[16]
     )

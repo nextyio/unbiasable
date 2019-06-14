@@ -70,7 +70,7 @@ export default class extends BaseService {
             .then((state) => {
                 console.log('state', web3.utils.toUtf8(state));
             })
-        methods.getChallengeData(seed)
+        methods.getChallenge(seed)
             .call()
             .then((results) => {
                 let i = 0;

@@ -23,14 +23,16 @@ export default createContainer(Component, (state) => {
     balance: state.user.balance,
     seed: state.rng.seed,
     iteration: state.rng.iteration,
+    state: state.rng.state,
+    commitCount: state.rng.commitCount,
+    validProofHash: state.rng.validProofHash,
   }
 }, () => {
   const rngService = new RNGService()
 
   return {
-    // TEST
-    async reload() {
-      return await rngService.reload()
+    async reload(entropy) {
+      return await rngService.reload(entropy)
     },
     async challenge(entropy, duration) {
       return await rngService.challenge(entropy, duration)
