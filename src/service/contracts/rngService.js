@@ -56,20 +56,56 @@ export default class extends BaseService {
         methods.getChallenge(seed)
             .call()
             .then((results) => {
-                let i = 0;
-                const maker = results[i++];
-                const entropy = results[i++];
-                const C = results[i++];
-                const T = results[i++];
-                const Te = results[i++];
-                const iteration = results[i++];
-                const commitCount = results[i++];
-                const validProofHash = results[i++].substr(2);
+                console.log(results);
+                const Te = results.Te;
+                const commitCount = results.commitCount;
+                const validProofHash = results.validProofHash.substr(2);
 
                 const rngRedux = this.store.getRedux('rng')
                 this.dispatch(rngRedux.actions.commitCount_update(commitCount))
                 if (validProofHash != "0000000000000000000000000000000000000000000000000000000000000000") {
                     this.dispatch(rngRedux.actions.validProofHash_update(validProofHash))
+                    methods.results(seed)
+                        .call()
+                        .then((results) => {
+                            console.log(Te);
+                            console.log(results);
+                            const numbers = results.numbers;
+                            const evaluators = results.evaluators;
+                            // TODO: make sure evaluators is sorted by number if it isn't
+                            let winners = [];
+                            const r = 1/2;
+                            let rr = 1;
+                            for (let i = 0; i < numbers.length; ++i) {
+                                if (evaluators[i] !== '0x0000000000000000000000000000000000000000') {
+                                    if (winners.length > 0) {
+                                        let j = winners.length - 1;
+                                        let delta = numbers[i] - winners[j].number;
+                                        winners[j].delta = delta;
+                                        winners[j].reward += delta * rr;
+                                        rr *= r;
+                                    }
+                                    winners.push({
+                                        evaluator: evaluators[i],
+                                        number: numbers[i],
+                                        reward: 0.0,
+                                    });
+                                }
+                            }
+                            // set delta(LastWinners)
+                            let j = winners.length - 1;
+                            let delta = Te - winners[j].number;
+                            winners[j].delta = delta;
+                            winners[j].reward += delta * rr;
+
+                            console.log(winners);
+
+                            for (let i = 0; i < winners.length; ++i) {
+                                winners[i].reward = (100 * winners[i].reward / Te) + '%';
+                            }
+
+                            console.log('winners =', winners);
+                        })
                 }
             })
     }

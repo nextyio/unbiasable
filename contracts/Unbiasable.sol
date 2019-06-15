@@ -135,7 +135,16 @@ contract Unbiasable {
         bytes32 seed
     )
         public view
-        returns (address, bytes32, uint256, uint256, uint256, uint256, uint256, bytes32)
+        returns (
+            address maker,
+            bytes32 entropy,
+            uint256 C,
+            uint256 T,
+            uint256 Te,
+            uint256 iteration,
+            uint256 commitCount,
+            bytes32 validProofHash
+        )
     {
         Challenge storage c = challenges[seed];
         return (c.maker, c.entropy, c.C, c.T, c.Te, c.t, c.commits.length, c.validProofHash);
@@ -146,7 +155,11 @@ contract Unbiasable {
         uint256 i
     )
         public view
-        returns (uint256 number, address evaluator, bytes32 proofCommit)
+        returns (
+            uint256 number,
+            address evaluator,
+            bytes32 proofCommit
+        )
     {
         Challenge storage c = challenges[seed];
         Commit storage cm = c.commits[i];
@@ -321,7 +334,6 @@ contract Unbiasable {
         public
         view
         returns (
-            uint256 Te,
             uint256[] memory numbers,
             address[] memory evaluators
         )
@@ -343,6 +355,6 @@ contract Unbiasable {
             numbers[i] = n;
             evaluators[i] = cm.evaluator;
         }
-        return (c.Te, numbers, evaluators);
+        return (numbers, evaluators);
     }
 }
