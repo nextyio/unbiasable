@@ -299,7 +299,6 @@ contract Unbiasable {
         bytes32 seed
     )
         public
-        returns (uint256[] memory numbers, address[] memory evaluators)
     {
         Challenge storage c = challenges[seed];
         require(state(c) == State.SUCCESS, "Challenge not success.");
@@ -314,14 +313,36 @@ contract Unbiasable {
                 continue;
             }
         }
-        // Copy number and address to return
+    }
+
+    function results(
+        bytes32 seed
+    )
+        public
+        view
+        returns (
+            uint256 Te,
+            uint256[] memory numbers,
+            address[] memory evaluators
+        )
+    {
+        Challenge storage c = challenges[seed];
         numbers = new uint256[](c.commits.length);
         evaluators = new address[](c.commits.length);
-        for (uint i = 0; i<c.commits.length; ++i) {
+        for (uint256 i = 0; i<c.commits.length; ++i) {
             Commit storage cm = c.commits[i];
-            numbers[i] = cm.number;
+            bytes32 proofCommit = calcProofCommit(cm.evaluator, c.validProofHash);
+            if (proofCommit != cm.proofCommit) {
+                // ignore invalid commit
+                continue;
+            }
+            uint256 n = cm.number - c.C;
+            if (n < 0 || n > c.Te) {
+                continue;
+            }
+            numbers[i] = n;
             evaluators[i] = cm.evaluator;
         }
-        return (numbers, evaluators);
+        return (c.Te, numbers, evaluators);
     }
 }
