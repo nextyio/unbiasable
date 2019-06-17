@@ -18,6 +18,7 @@ export default {
   '0016': 'Transfer',
   '0017': 'Manual',
   '0018': 'Auto',
+  '0019': 'Reward',
 
   '0100': 'Developer',
   '0101': 'Social',

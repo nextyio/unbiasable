@@ -1,5 +1,6 @@
 import RNGPage from '@/module/page/rng/Container'
 import ManualPage from '@/module/page/manual/Container'
+import RewardPage from '@/module/page/reward/Container'
 
 import LoginPage from '@/module/page/login/Container'
 
@@ -17,6 +18,10 @@ export default [
   {
     path: '/manual',
     page: ManualPage
+  },
+  {
+    path: '/reward',
+    page: RewardPage
   },
   {
     path: '/login',

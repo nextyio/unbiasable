@@ -97,9 +97,14 @@ export default class extends BaseComponent {
           <Menu.Item key="manual">
             <Icon type="calculator" /> {I18N.get('0017')}
           </Menu.Item>
+          <Menu.Item key="reward">
+            <Icon type="area-chart" /> {I18N.get('0019')}
+          </Menu.Item>
+          {/* 
           <Menu.Item key="auto">
             <Icon type="setting" class="anticon-spin" /> {I18N.get('0018')}
           </Menu.Item>
+           */}
         </Menu>
       </Sider>
     )
@@ -110,6 +115,7 @@ export default class extends BaseComponent {
     if (_.includes([
       'home',
       'manual',
+      'reward',
       'auto',
     ], key)) {
       this.props.history.push('/' + e.key)
@@ -136,7 +142,7 @@ export default class extends BaseComponent {
       'home',
       'rng',
       'manual',
-      'auto',
+      'reward',
     ]
 
     if (!url) {
