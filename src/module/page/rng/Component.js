@@ -2,6 +2,7 @@ import React from 'react' // eslint-disable-line
 import LoggedInPage from '../LoggedInPage'
 import { Link } from 'react-router-dom' // eslint-disable-line
 import web3 from 'web3'
+//import solc from 'solc'
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 import './style.scss'
@@ -18,8 +19,7 @@ const weiToCoin = (wei) => {
 
 export default class extends LoggedInPage {
   state = {
-    entropy: "",
-    duration: 0,
+    code: "address(0x0).transfer(0);",
   }
 
   async componentDidMount() {
@@ -37,19 +37,19 @@ export default class extends LoggedInPage {
           <div className="ant-col-md-18 ant-col-md-offset-3 text-alert" style={{ 'textAlign': 'left' }}>
 
             <Row>
-              <Col span={6}>
+              <Col span={4}>
                 Wallet
               </Col>
-              <Col span={18}>
+              <Col span={20}>
                 {this.props.wallet}
               </Col>
             </Row>
 
             <Row>
-              <Col span={6}>
+              <Col span={4}>
                 Balance
               </Col>
-              <Col span={18}>
+              <Col span={20}>
                 {weiToCoin(this.props.balance)} Coin
               </Col>
             </Row>
@@ -57,103 +57,16 @@ export default class extends LoggedInPage {
             <div className="ebp-header-divider dashboard-rate-margin">
             </div>
 
-            <Row style={{ 'marginTop': '15px' }}>
-              <Col span={6}>
-                Entropy
-              </Col>
-              <Col span={18}>
-                <Input className="maxWidth"
-                  defaultValue={0}
-                  value={this.state.entropy}
-                  onChange={this.entropyChange.bind(this)}
-                />
-              </Col>
-            </Row>
-
-            <Row style={{ 'marginTop': '15px' }}>
-              <Col span={6}>
-                T (blocks)
-              </Col>
-              <Col span={6}>
-                <InputNumber className="maxWidth"
-                  defaultValue={0}
-                  value={this.state.duration}
-                  onChange={this.durationChange.bind(this)}
-                />
-              </Col>
-              <Col span={6}/>
-              <Col span={6}>
-                <Button onClick={() => this.challenge()} type="primary" className="btn-margin-top submit-button maxWidth">Challenge</Button>
-              </Col>
-            </Row>
-
-            { this.props.seed &&
+            {
               <Row style={{ 'marginTop': '15px' }}>
-                <Col span={6}>
-                  Seed
-                </Col>
-                <Col span={14}>
-                  {shorten(this.props.seed)}
-                </Col>
                 <Col span={4}>
-                  <CopyToClipboard text={this.props.seed.substr(2)}>
-                    <Button className="maxWidth">Copy</Button>
-                  </CopyToClipboard>
+                  Code
                 </Col>
-              </Row>
-            }
-
-            { this.props.iteration > 0 &&
-              <Row style={{ 'marginTop': '15px' }}>
-                <Col span={6}>
-                  Iteration
-                </Col>
-                <Col span={6}>
-                  {this.props.iteration}
-                </Col>
-                <Col span={8}>
-                </Col>
-                <Col span={4}>
-                  <CopyToClipboard text={this.props.iteration}>
-                    <Button className="maxWidth">Copy</Button>
-                  </CopyToClipboard>
-                </Col>
-              </Row>
-            }
-
-            <div className="ebp-header-divider dashboard-rate-margin">
-            </div>
-
-            {
-              <Row style={{ 'marginTop': '15px' }}>
-                <Col span={6}>
-                  State
-                </Col>
-                <Col span={18}>
-                  {this.props.state}
-                </Col>
-              </Row>
-            }
-
-            {
-              <Row style={{ 'marginTop': '15px' }}>
-                <Col span={6}>
-                  Commit Count
-                </Col>
-                <Col span={18}>
-                  {this.props.commitCount}
-                </Col>
-              </Row>
-            }
-
-            {
-              <Row style={{ 'marginTop': '15px' }}>
-                <Col span={6}>
-                  Valid Proof Hash
-                </Col>
-                <Col span={18}>
+                <Col span={20}>
                   <Input.TextArea className="maxWidth"
-                    value={this.props.validProofHash}
+                    autosize={{minRows: 8}}
+                    value={this.state.code}
+                    onChange={this.codeChange.bind(this)}
                   />
                 </Col>
               </Row>
@@ -161,7 +74,7 @@ export default class extends LoggedInPage {
 
             <Row style={{ 'marginTop': '15px' }}>
               <Col span={24}>
-                <Button onClick={() => this.reload()} type="primary" className="btn-margin-top submit-button maxWidth">Reload</Button>
+                <Button onClick={() => this.send()} type="primary" className="btn-margin-top submit-button maxWidth">Send</Button>
               </Col>
             </Row>
 
@@ -182,23 +95,13 @@ export default class extends LoggedInPage {
     )
   }
 
-  entropyChange(e) {
+  codeChange(duration) {
     this.setState({
-      entropy: e.target.value
+      code: code
     })
   }
 
-  durationChange(duration) {
-    this.setState({
-      duration: duration
-    })
-  }
-
-  challenge() {
-    this.props.challenge(this.state.entropy, this.state.duration);
-  }
-
-  reload() {
-    this.props.reload(this.state.entropy);
+  send() {
+    this.props.send(this.state.code);
   }
 }

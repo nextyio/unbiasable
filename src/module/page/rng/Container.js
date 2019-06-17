@@ -1,3 +1,4 @@
+import { BrowserSolc } from '@/util'
 import { createContainer } from '@/util'
 import Component from './Component'
 import RNGService from '@/service/contracts/rngService'
@@ -15,27 +16,23 @@ export default createContainer(Component, (state) => {
     loadOnInit()
     setInterval(() => {
       load()
+
     }, 5000)
   }
 
   return {
     wallet: state.user.wallet,
     balance: state.user.balance,
-    seed: state.rng.seed,
-    iteration: state.rng.iteration,
-    state: state.rng.state,
-    commitCount: state.rng.commitCount,
-    validProofHash: state.rng.validProofHash,
+    code: state.rng.code,
   }
 }, () => {
-  const rngService = new RNGService()
+  //const rngService = new RNGService()
 
   return {
-    async reload(entropy) {
-      return await rngService.reload(entropy)
-    },
-    async challenge(entropy, duration) {
-      return await rngService.challenge(entropy, duration)
+    async send(code) {
+      let source = 'contract demo {string public name = "Petros"; function changeName(string _newName){name = _newName; } }'; 
+      console.log(BrowserSolc);
+      //return await rngService.challenge(entropy, duration)
     },
   }
 })
