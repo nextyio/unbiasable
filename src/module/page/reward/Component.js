@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom' // eslint-disable-line
 
 import './style.scss'
 
-import { Col, Row, Icon, Breadcrumb, Slider } from 'antd' // eslint-disable-line
+import { Col, Row, Icon, Breadcrumb, Slider, Input } from 'antd' // eslint-disable-line
 
 function formatter(value) {
   return `${value}%`;
@@ -12,6 +12,7 @@ function formatter(value) {
 
 export default class extends LoggedInPage {
   state = {
+    r: 1/2,
     numbers: [50, 100, 100, 100, 100],
     rewards: [50, 0, 0, 0, 0],
   }
@@ -51,6 +52,18 @@ export default class extends LoggedInPage {
           <h3 className="text-center">Reward Calculator</h3>
           <div className="ant-col-md-18 ant-col-md-offset-3 text-alert" style={{ 'textAlign': 'left' }}>
 
+            <Row style={{ 'marginTop': '15px' }}>
+              <Col span={6}>
+                Reduction Rate:
+              </Col>
+              <Col span={6}>
+                <Input className="maxWidth"
+                  value={this.state.r}
+                  onChange={this.rChange.bind(this)}
+                />
+              </Col>
+            </Row>
+
             {this.createSliders()}
 
           </div>
@@ -68,13 +81,48 @@ export default class extends LoggedInPage {
     )
   }
 
-  sliderChange(e, value) {
-    console.log(e.i, value);
-    console.log(this.state.numbers);
-    const { numbers } = this.state
-    numbers[e.i] = value;
+  rChange(e) {
     this.setState({
-      numbers: numbers
+      r: e.target.value
+    })
+  }
+
+  sliderChange(e, value) {
+    const { numbers, rewards } = this.state
+    numbers[e.i] = value;
+    // populate an array
+    let evaluators = [];
+    for (let i = 0; i < numbers.length; ++i) {
+      evaluators.push({
+        index: i,
+        number: numbers[i],
+        reward: 0,
+      })
+    }
+    // sort the array
+    evaluators = evaluators.sort((a, b) => a.number - b.number)
+    // calculate the rewards
+    const r = this.state.r;
+    let rr = 1;
+    for (let i = 0; i < evaluators.length; ++i) {
+      let j = i + 1;
+      if (j < evaluators.length) {
+        evaluators[i].delta = evaluators[j].number - evaluators[i].number;
+      } else {
+        evaluators[i].delta = 100 - evaluators[i].number;
+      }
+      for (let k = 0; k <= i; ++k) {
+        evaluators[k].reward += evaluators[i].delta * rr;
+      }
+      rr *= r;
+    }
+    for (let i = 0; i < evaluators.length; ++i) {
+      rewards[evaluators[i].index] = evaluators[i].reward.toFixed(2);
+    }
+    // update the state
+    this.setState({
+      numbers: numbers,
+      rewards: rewards,
     })
   }
 
