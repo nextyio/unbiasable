@@ -25,7 +25,7 @@ export default class extends LoggedInPage {
     let content = [];
     for (let i = 0; i < this.state.numbers.length; ++i) {
       content.push(
-        <Row>
+        <Row key={"slider_"+i}>
           <Col span={22}>
             <Slider
               tipFormatter={formatter}
