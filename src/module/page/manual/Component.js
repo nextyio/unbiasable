@@ -28,7 +28,6 @@ const weiToCoin = (wei) => {
 export default class extends LoggedInPage {
   state = {
     seed: "",
-    iteration: 0,
     proof: "",
   }
 
@@ -76,18 +75,6 @@ export default class extends LoggedInPage {
                   defaultValue={0}
                   value={this.state.seed}
                   onChange={this.seedChange.bind(this)}
-                />
-              </Col>
-            </Row>
-            <Row style={{ 'marginTop': '15px' }}>
-              <Col span={6}>
-                Iteration
-              </Col>
-              <Col span={12}>
-                <InputNumber className="maxWidth"
-                  defaultValue={0}
-                  value={this.state.iteration}
-                  onChange={this.iterationChange.bind(this)}
                 />
               </Col>
             </Row>
@@ -154,10 +141,10 @@ export default class extends LoggedInPage {
   }
   
   commit() {
-    this.props.commit(this.state.seed, this.state.iteration, this.state.proof);
+    this.props.commit(this.state.seed, this.state.proof);
   }
 
   verify() {
-    this.props.verify(this.state.seed, this.state.iteration, this.state.proof);
+    this.props.verify(this.state.seed, this.state.proof);
   }
 }

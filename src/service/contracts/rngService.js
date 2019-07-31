@@ -12,7 +12,7 @@ export default class extends BaseService {
         let seed = await methods.calcSeed(wallet, entropyHex).call();
         console.log('entropy', entropy, 'hex', entropyHex, 'seed', seed)
         // send the transaction
-        methods.challenge(entropyHex, duration.toString())
+        methods.challenge(2048, entropyHex, duration.toString())
             .send({from: wallet})
             .on('error', (error) => {
                 console.error(error)
@@ -59,12 +59,12 @@ export default class extends BaseService {
                 console.log(results);
                 const Te = results.Te;
                 const commitCount = results.commitCount;
-                const validProofHash = results.validProofHash.substr(2);
+                const validOutputHash = results.validOutputHash.substr(2);
 
                 const rngRedux = this.store.getRedux('rng')
                 this.dispatch(rngRedux.actions.commitCount_update(commitCount))
-                if (validProofHash != "0000000000000000000000000000000000000000000000000000000000000000") {
-                    this.dispatch(rngRedux.actions.validProofHash_update(validProofHash))
+                if (validOutputHash != "0000000000000000000000000000000000000000000000000000000000000000") {
+                    this.dispatch(rngRedux.actions.validProofHash_update(validOutputHash))
                     methods.results(seed)
                         .call()
                         .then((results) => {

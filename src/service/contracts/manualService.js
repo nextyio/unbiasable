@@ -2,34 +2,20 @@ import BaseService from '../../model/BaseService'
 import web3 from 'web3'
 import _ from 'lodash'
 
-// assemble the seed + iterator + proof input
-function assembleInput(seed, iteration, proof) {
-    let input = [];
-    input.push(seed);
-    const iterationStr = '0x' + web3.utils.toHex(iteration).substr(2).padStart(64, '0');
-    input.push(iterationStr);
-    for (let i = 0; i < 16; ++i) {
-        let str = proof.substr(64*i, 64);
-        input.push('0x' + str);
-    }
-    return input;
-}
-
 export default class extends BaseService {
 
-    async commit(seed, iteration, proof) {
+    async commit(seed, output) {
         const store = this.store.getState()
         const wallet = store.user.wallet
         seed = '0x' + seed;
-
-        const input = assembleInput(seed, iteration, proof);
+        output = '0x' + output;
 
         const methods = store.contracts.unbiasable.methods
-        const proofHash = await methods.calcProofHash(input).call({from :wallet});
-        console.log('proofHash', proofHash);
-        const proofCommit = await methods.calcProofCommit(wallet, proofHash).call({from: wallet});
-        console.log('proofCommit', proofCommit);
-        methods.commit(seed, proofCommit)
+        const outputHash = await methods.calcOutputHash(output).call({from :wallet});
+        console.log('outputHash', outputHash);
+        const outputCommit = await methods.calcOutputCommit(wallet, outputHash).call({from: wallet});
+        console.log('outputCommit', outputCommit);
+        methods.commit(seed, outputCommit)
             .send({from: wallet})
             .on('error', (error) => {
                 console.error(error)
@@ -51,20 +37,21 @@ export default class extends BaseService {
             });
     }
 
-    async verify(seed, iteration, proof) {
+    async verify(seed, output) {
         const store = this.store.getState()
         const wallet = store.user.wallet
         seed = '0x' + seed;
+        output = '0x' + output;
 
-        const input = assembleInput(seed, iteration, proof);
-        console.log(input);
+        // const input = assembleInput(seed, iteration, proof);
+        // console.log(input);
 
         const methods = store.contracts.unbiasable.methods
-        methods.isValid(input)
-            .call()
-            .then((isValid) => {
-                console.log('isValid', isValid);
-            })
+        // methods.isValid(input)
+        //     .call()
+        //     .then((isValid) => {
+        //         console.log('isValid', isValid);
+        //     })
         methods.getState(seed)
             .call()
             .then((state) => {
@@ -74,16 +61,19 @@ export default class extends BaseService {
             .call()
             .then((results) => {
                 let i = 0;
-                console.log('maker', results[i++]);
-                console.log('entropy', results[i++]);
-                console.log('C', results[i++]);
-                console.log('T', results[i++]);
-                console.log('Te', results[i++]);
-                console.log('iteration', results[i++]);
-                console.log('commitCount', results[i++]);
-                console.log('validProofHash', results[i++]);
+                console.log('maker', results.maker);
+                console.log('entropy', results.entropy);
+                console.log('C', results.C);
+                console.log('T', results.T);
+                console.log('Te', results.Te);
+                console.log('bitSize', results.bitSize);
+                console.log('iteration', results.iteration);
+                console.log('commitCount', results.commitCount);
+                console.log('validOutputHash', results.validOutputHash);
             })
-        methods.verify(input)
+        console.log('seed', seed);
+        console.log('proof', output);
+        methods.verify(seed, output)
             .send({from: wallet, gasLimit: 222000})
             .on('error', (error) => {
                 console.error(error)
