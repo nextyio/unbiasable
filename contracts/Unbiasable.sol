@@ -303,16 +303,20 @@ contract Unbiasable {
     {
         uint output;
         uint len = input.length;
+        bool failure;
         assembly {
             // define pointer
             let p := mload(0x20)
             // call vdfVerify precompile
             if iszero(call(not(0), 0xFF, 0, add(input, 0x20), len, p, 0x20)) {
-                revert(0, 0)
+                failure := 1
             }
             // return value
             output := mload(p)
         }
+        if (failure) {
+            revert("failed to call VDFVerify precompiled contract");
+    }
         return output != 0;
     }
 
