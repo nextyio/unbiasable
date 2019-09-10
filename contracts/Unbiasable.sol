@@ -75,7 +75,6 @@ contract Unbiasable {
         returns (bytes32 seed)
     {
         require(entropy != 0x0, "Must provide entropy");
-        require(isPowerOfTwo(bitSize), "Only 2^x bit size is support for now");
         seed = _calcSeed(msg.sender, entropy);
         require(challenges[seed].maker == address(0x0), "Duplicated challenge");
         uint Tv = Math.max(_T * vDividend / vDivisor, MinV);
@@ -316,12 +315,8 @@ contract Unbiasable {
         }
         if (failure) {
             revert("failed to call VDFVerify precompiled contract");
-    }
+        }
         return output != 0;
-    }
-
-    function isPowerOfTwo(uint x) internal pure returns(bool) {
-        return (x != 0) && ((x & (x - 1)) == 0);
     }
 
     // FOR TEST
