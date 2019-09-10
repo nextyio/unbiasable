@@ -74,7 +74,7 @@ export default class extends BaseService {
         console.log('seed', seed);
         console.log('proof', output);
         methods.verify(seed, output)
-            .send({from: wallet, gasLimit: 222000})
+            .send({from: wallet, gasLimit: 42000000})
             .on('error', (error) => {
                 console.error(error)
             })
